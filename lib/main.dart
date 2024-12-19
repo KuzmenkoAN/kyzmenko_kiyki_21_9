@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
-import '../widgets/students_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'widgets/screen_tabs.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const ProviderScope(child: CustomApp()));
 }
 
-class MyApp extends StatelessWidget {
+class CustomApp extends StatelessWidget {
+  const CustomApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Student List',
+      title: 'Univer',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.teal,
+        textTheme: GoogleFonts.latoTextTheme().copyWith(
+          titleLarge: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          bodyMedium: const TextStyle(fontSize: 14),
+        ),
       ),
-      home: StudentsScreen(),
+      home: const TabsScreen(),
     );
   }
 }
