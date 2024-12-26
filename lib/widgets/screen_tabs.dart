@@ -1,21 +1,32 @@
 import 'package:flutter/material.dart';
-import 'departments_screen.dart';
-import 'students_screen.dart';
+import 'screen_departments.dart';
+import 'screen_students.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TabsScreen extends StatefulWidget {
+class TabsScreen extends ConsumerStatefulWidget {
   const TabsScreen({super.key});
 
   @override
-  State<TabsScreen> createState() => _TabsScreenState();
+  ConsumerState<TabsScreen> createState() => _TabsScreenState();
+
 }
 
-class _TabsScreenState extends State<TabsScreen> {
+class _TabsScreenState extends ConsumerState<TabsScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
     const DepartmentsScreen(),
     const StudentsScreen(),
   ];
+
+  void _showInfoMessage(String message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
 
   final List<String> _titles = ['Departments', 'Students'];
 

@@ -13,8 +13,9 @@ class DepartmentsScreen extends ConsumerWidget {
 
     Map<Department, int> departmentStudentCounts = {};
     for (var department in Department.values) {
-      departmentStudentCounts[department] =
-          students.where((s) => s.department == department).length;
+      departmentStudentCounts[department] = students == null 
+      ? 0 
+      : students.where((s) => s.department == department).length;
     }
 
     return Scaffold(
@@ -39,9 +40,6 @@ class DepartmentsScreen extends ConsumerWidget {
           final department = Department.values[index];
           return InkWell(
             borderRadius: BorderRadius.circular(15),
-            onTap: () {
-              // You can add navigation or action here
-            },
             child: DepartmentItem(
               name: departmentNames[department]!,
               studentCount: departmentStudentCounts[department] ?? 0,

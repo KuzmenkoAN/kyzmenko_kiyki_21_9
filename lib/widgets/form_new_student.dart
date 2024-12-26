@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import '../models/student.dart';
 import '../models/department.dart';
+import '../providers/provide_students.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class NewStudent extends StatefulWidget {
-  final Student? student;
-  final void Function(Student) onSave;
+class NewStudent extends ConsumerStatefulWidget {
+  final int? studentIndex;
 
-  const NewStudent({super.key, this.student, required this.onSave});
+  const NewStudent({super.key, this.studentIndex});
 
   @override
-  State<NewStudent> createState() => _NewStudentState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _NewStudentState();
 }
 
-class _NewStudentState extends State<NewStudent> {
+class _NewStudentState extends ConsumerState<NewStudent> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   Department _selectedDepartment = Department.it;
@@ -22,14 +23,48 @@ class _NewStudentState extends State<NewStudent> {
   @override
   void initState() {
     super.initState();
-    if (widget.student != null) {
-      _firstNameController.text = widget.student!.firstName;
-      _lastNameController.text = widget.student!.lastName;
-      _selectedDepartment = widget.student!.department;
-      _selectedGender = widget.student!.gender;
-      _grade = widget.student!.grade;
+    if (widget.studentIndex != null) {
+      final student = ref.read(studentsProvider)![widget.studentIndex!];
+      _firstNameController.text = student.firstName;
+      _lastNameController.text = student.lastName;
+      _grade = student.grade;
+      _selectedGender = student.gender;
+      _selectedDepartment = student.department;
     }
   }
+  
+ void _saveStudent() async {
+  try {
+    if (widget.studentIndex != null) {
+      await ref.read(studentsProvider.notifier).editStudent(
+            widget.studentIndex!,
+            _firstNameController.text.trim(),
+            _lastNameController.text.trim(),
+            _selectedDepartment,
+            _selectedGender,
+            _grade,
+          );
+    } else {
+      await ref.read(studentsProvider.notifier).addStudent(
+            _firstNameController.text.trim(),
+            _lastNameController.text.trim(),
+            _selectedDepartment,
+            _selectedGender,
+            _grade,
+          );
+    }
+
+    if (!context.mounted) return;
+
+    Navigator.of(context).pop(null); // Успешное завершение, возвращаем null
+  } catch (e) {
+    if (!context.mounted) return;
+
+    Navigator.of(context).pop('Failed to save student: ${e.toString()}'); // Возвращаем сообщение об ошибке
+  }
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -152,17 +187,7 @@ class _NewStudentState extends State<NewStudent> {
                       fontSize: 16,
                     ),
                   ),
-                  onPressed: () {
-                    final newStudent = Student(
-                      firstName: _firstNameController.text,
-                      lastName: _lastNameController.text,
-                      department: _selectedDepartment,
-                      grade: _grade,
-                      gender: _selectedGender,
-                    );
-                    widget.onSave(newStudent);
-                    Navigator.pop(context);
-                  },
+                  onPressed: _saveStudent,
                   child: const Text('Save'),
                 ),
               ],
